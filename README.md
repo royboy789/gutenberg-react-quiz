@@ -1,5 +1,5 @@
 # Gutenberg React Quiz Plugin
-Gutenberg based Quiz Plugin. Use Gutenberg to build your quiz, use Gutenberg ot display your quiz.
+Gutenberg based Quiz Plugin. Use Gutenberg to build your quiz, use Gutenberg to display your quiz.
   
 __React__ powers it all.
 
