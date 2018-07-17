@@ -5,8 +5,8 @@ __React__ powers it all.
 
 ### Overview
 There is currently 2 React Apps. 
-- 1 is Gutenberg, so `gutes-dev` and `gutes-build` build and run those React components
-- 2 is the QuizApp React App which runs on the front end.
+* 1 is Gutenberg, so `gutes-dev` and `gutes-build` build and run those React components
+* 2 is the QuizApp React App which runs on the front end.
 
 ## Installation
 * Clone
@@ -14,8 +14,8 @@ There is currently 2 React Apps.
 * Run `npm run gutes-build` 
 
 __REQUIRES__
-- Gutenberg
-- [My Gutenberg Object Plugin](https://github.com/royboy789/gutenberg-object-plugin/)
+* Gutenberg
+* [My Gutenberg Object Plugin](https://github.com/royboy789/gutenberg-object-plugin/)
 
 ## Instructions
 * Creating a new Quiz (CPT)
@@ -23,16 +23,22 @@ __REQUIRES__
 * Go to a post or page running Gutenberg, use the Quiz Block to add the quiz
 
 ## Question Types
-- Multiple Choice - text choices
+* Multiple Choice text choices
 
 # TODO
-I have not finished the quiz front end. Once a user completes every question, it shoudl take them to a "completed" screen with the % correct
+
+### Extendable "completed" screen
+* Filterable title & message args = % correct, array of results
 
 ### Question Types To Add
-- Video Embed w/ multiple choice
-- Multiple Choice - each choice an image
-- Text - with supporting "correct answers" array
-- Textarea
+* Video Embed w/ multiple choice
+* Multiple Choice - each choice an image
+* Text * with supporting "correct answers" array
+* Textarea
 
-## Possible Quiz Types (taxonomy powered)
-- Youtube Embed with quiz, pause at points to ask question. End of video show results (or option to skip to results)
+### Possible Quiz Types (taxonomy powered)
+* Youtube Embed with quiz, pause at points to ask question. End of video show results (or option to skip to results)
+
+### Extendability
+* Add in hook to add more question types (filterable array?)
+* Create more actions that run (after question answered, after all questions answered, etc.)
