@@ -33,3 +33,6 @@ I have not finished the quiz front end. Once a user completes every question, it
 - Multiple Choice - each choice an image
 - Text - with supporting "correct answers" array
 - Textarea
+
+## Possible Quiz Types (taxonomy powered)
+- Youtube Embed with quiz, pause at points to ask question. End of video show results (or option to skip to results)
