@@ -93,7 +93,7 @@ class QuizApp extends Component {
     const { quiz_result } = this.state;
 
     if ( 90 < quiz_result ) {
-      return 'Congradulations!';
+      return 'Congratulations!';
     } else {
       return 'Better luck next time!';
     }
