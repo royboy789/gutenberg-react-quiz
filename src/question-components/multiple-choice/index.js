@@ -7,11 +7,7 @@ export default class QuestionMultipleChoice extends Component {
 
   constructor( props ) {
     super( props );
-    console.log( props );
     this.state = props;
-    this.setState({
-      select_answer: null
-    });
     this.answer = this.answer.bind(this);
   }
 
