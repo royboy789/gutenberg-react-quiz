@@ -1,0 +1,39 @@
+{
+  "name": "react-quiz",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "ajv": "^6.5.2",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.5",
+    "babel-plugin-transform-css-import-to-string": "0.0.2",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "cross-env": "^5.1.3",
+    "css-loader": "^0.28.11",
+    "node-sass": "^4.9.0",
+    "sass-loader": "^7.0.3",
+    "style-loader": "^0.21.0",
+    "to-string-loader": "^1.1.5",
+    "webpack": "^3.10.0"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "node-sass-chokidar": "^1.3.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-scripts": "1.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "build-css": "node-sass-chokidar src/ -o src/",
+    "watch-css": "npm run build-css && node-sass-chokidar src/ -o src/ --watch --recursive",
+    "gutes-build": "cross-env BABEL_ENV=default NODE_ENV=production webpack",
+    "gutes-dev": "cross-env BABEL_ENV=default webpack --watch"
+  }
+}

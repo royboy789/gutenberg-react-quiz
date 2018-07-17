@@ -1,0 +1,21 @@
+{
+    "name": "roysivan/react-quiz-plugin",
+    "description": "React Quiz plugin",
+    "type": "wordpress-plugin",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Roy Sivan",
+            "email": "roy@roysivan.com"
+        }
+    ],
+    "require": {
+        "php" : "^7.1",
+        "composer/installers": "^1.5"
+    },
+    "autoload" : {
+        "psr-4": {
+            "ReactQuiz\\": "inc/"
+        }
+    }
+}
