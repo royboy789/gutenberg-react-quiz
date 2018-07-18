@@ -77,7 +77,7 @@ export default class QuestionMultipleChoiceEdit extends Component {
                   options={attributes.options}
                   onChange={ (e) => this.changeVal( e, 'options') }
                 />
-                <span class="btn button" onClick={this.addOption}>+ Option</span>
+                <span className={"btn button"} onClick={this.addOption}>+ Option</span>
               </div>
               <div>
                 <RadioControl

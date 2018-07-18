@@ -26,7 +26,7 @@ __REQUIRES__
 * Multiple Choice text choices
 * Single Text - you set all the possible _correct_ answers
 
-## Hooks
+## JavaScript Hooks
 There are a number of `wp.hooks` I've implemented, and will be adding more as I go
 
 ### Example
@@ -40,6 +40,10 @@ wp.hooks.addFilter( 'reactQuiz_complete_message_title', 'my_title', 10 );
 ```
 
 ### Filters
+__Gutenberg__
+* __reactQuiz_gutes_questions__ - array of block data
+  * `allBlocks` - array of blocks (questions)
+
 __Quiz App__
 * __reactQuiz_load_question_component__ - select which component loads
   * `returnComp` - component to return 
