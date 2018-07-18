@@ -37,6 +37,7 @@ export default class QuestionText extends Component {
     return (
       <div>
         <h4>{ this.state.question }</h4>
+        <em>{ this.state.hint }</em>
         <TextControl
           value={ this.state.text_answer }
           onChange={ this.setAnswer }

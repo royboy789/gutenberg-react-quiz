@@ -25,6 +25,7 @@ export default class QuestionMultipleChoice extends Component {
     return (
       <div>
         <h4>{ this.state.question }</h4>
+        <em>{ this.state.hint }</em>
         <RadioControl
           options={ this.state.options }
           selected={ this.state.select_answer }
