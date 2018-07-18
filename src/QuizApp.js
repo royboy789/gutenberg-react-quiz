@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import './QuizApp.css';
 import axios from 'axios';
+
+// Questions
 import QuestionMultipleChoice from './question-components/multiple-choice';
+import QuestionText from './question-components/text';
 
 
 const api = axios.create({
@@ -36,7 +39,23 @@ class QuizApp extends Component {
   }
 
   questionComponent( question ) {
-    return QuestionMultipleChoice;
+    question = question.replace( 'react-quiz-blocks/', '' );
+
+    let returnComp = false;
+
+    switch( question ) {
+      case 'question-multiple-choice':
+        returnComp = QuestionMultipleChoice;
+        break;
+      case 'question-text':
+        returnComp = QuestionText;
+        break;
+      default:
+        console.log( 'cannot find question type: ' + question );
+        break;
+    }
+
+    return returnComp;
   }
 
   loadQuestion( question_key ) {
@@ -47,6 +66,7 @@ class QuizApp extends Component {
 
     let questionBlock = this.questionComponent( question.name );
     question.data.nextQuestion = this.nextQuestion;
+
     return(
       <div key={question.uid}>
         { React.createElement( questionBlock, question.data ) }
@@ -54,9 +74,8 @@ class QuizApp extends Component {
     );
   }
 
-  nextQuestion( correct_answer, given_answer ) {
+  nextQuestion( correct ) {
     let { answered_questions, current_question, total_questions } = this.state;
-    let correct = correct_answer === given_answer;
     answered_questions[ current_question ] = correct;
 
     this.setState({

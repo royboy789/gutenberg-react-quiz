@@ -17,7 +17,8 @@ export default class QuestionMultipleChoice extends Component {
       select_answer: e
     });
 
-    this.props.nextQuestion( correct_answer, e );
+    let correct = correct_answer === e;
+    this.props.nextQuestion( correct );
   }
 
   render() {
