@@ -32,7 +32,8 @@ class ReactQuizPlugin {
 		$dir = __DIR__;
 		$blocks_js = '/build/static/js/bundle.js';
 		wp_enqueue_script( 'wp-components' );
-		wp_enqueue_script( 'react-quiz-main', '//localhost:3000/static/js/bundle.js', array( 'wp-components' ), null, true );
+		wp_enqueue_script( 'wp-hooks' );
+		wp_enqueue_script( 'react-quiz-main', '//localhost:3000/static/js/bundle.js', array( 'wp-hooks' ), null, true );
 	}
 
 	public function react_quiz_enqueue_block_editor_assets() {

@@ -26,6 +26,38 @@ __REQUIRES__
 * Multiple Choice text choices
 * Single Text - you set all the possible _correct_ answers
 
+## Hooks
+There are a number of `wp.hooks` I've implemented, and will be adding more as I go
+
+### Example
+```
+function my_title( title, quiz_result ) {
+    if ( 100 === quiz_result ) {
+        return 'PERFECT SCORE!';
+    }
+}
+wp.hooks.addFilter( 'reactQuiz_complete_message_title', 'my_title', 10 );
+```
+
+### Filters
+__Quiz App__
+* __reactQuiz_load_question_component__ - select which component loads
+  * `returnComp` - component to return 
+  * `question` - question (block name) being loaded
+* __reactQuiz_quiz_final_state__ - runs when quiz is completed
+  * `final_state` - object to pass into `setState` on quiz completion
+* __reactQuiz_complete_message_title__ - title for complete message
+  * `title` - current title
+  * `quiz_result` - number representing % of correct answers
+* __reactQuiz_complete_message__ - message for complete message
+  * `message` - current message
+  * `quiz_result` - number representing % of correct answers
+  
+### Actions
+__Quiz App__
+* __reactQuiz_complete_react_quiz__ - fires when quiz completed
+  * `state` - the whole state of the Quiz App
+
 # TODO
 
 ### Extendable "completed" screen

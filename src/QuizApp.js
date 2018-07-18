@@ -11,6 +11,8 @@ const api = axios.create({
   baseURL: 'http://wordpress.test/wp-json/'
 });
 
+const wp = window.wp;
+
 class QuizApp extends Component {
 
   constructor( props ) {
@@ -25,6 +27,8 @@ class QuizApp extends Component {
       current_question: 0
     };
 
+    // Get Question Data from Editor blocks
+    // REQUIRES GUTENBERG OBJECT PLUGIN - https://github.com/royboy789/gutenberg-object-plugin
     api.get('wp/v2/quiz/' + this.state.id).then((res) => {
       if ( ! res.data ) { return false; }
       this.setState({
@@ -38,6 +42,12 @@ class QuizApp extends Component {
 
   }
 
+  /**
+   * Determine which question component to load
+   *
+   * @param question
+   * @returns {*|boolean}
+   */
   questionComponent( question ) {
     question = question.replace( 'react-quiz-blocks/', '' );
 
@@ -55,9 +65,18 @@ class QuizApp extends Component {
         break;
     }
 
+    // Filter the right comp to load based on question
+    returnComp = wp.hooks.applyFilters( 'reactQuiz_load_question_component', returnComp, question );
+
     return returnComp;
   }
 
+  /**
+   * Load Question Component
+   *
+   * @param question_key
+   * @returns {*}
+   */
   loadQuestion( question_key ) {
     let { questions } = this.state;
     let question = questions[ question_key ];
@@ -74,10 +93,18 @@ class QuizApp extends Component {
     );
   }
 
+  /**
+   * Load the next question - gets passed into every question component
+   *
+   * @param correct
+   */
   nextQuestion( correct ) {
     let { answered_questions, current_question, total_questions } = this.state;
+
+    // add correct bool to array of all answered questions
     answered_questions[ current_question ] = correct;
 
+    // set state
     this.setState({
       answered_questions: answered_questions,
       current_question: current_question+=1
@@ -89,16 +116,32 @@ class QuizApp extends Component {
 
   }
 
+  /**
+   * Complete Quiz
+   */
   completeQuiz() {
     const { answered_questions, total_questions } = this.state;
 
-    this.setState({
+    let final_state = {
       quiz_complete: true,
       quiz_result: ( this.countInArray( answered_questions, true ) / total_questions ) * 100
+    };
+
+    wp.hooks.applyFilters( 'reactQuiz_quiz_final_state', final_state );
+
+    this.setState( final_state, () => {
+      wp.hooks.doAction( 'reactQuiz_complete_react_quiz', this.state );
     });
   }
 
-  countInArray(array, what) {
+  /**
+   * Count how many times "what" appaers in array
+   *
+   * @param array
+   * @param what
+   * @returns {number}
+   */
+  countInArray( array, what ) {
     let count = 0;
     for (let i = 0; i < array.length; i++) {
       if (array[i] === what) {
@@ -108,32 +151,51 @@ class QuizApp extends Component {
     return count;
   }
 
+  /**
+   * Load Message Title when quiz completed
+   *
+   * @returns {*}
+   */
   loadCompleteMessageTitle() {
     const { quiz_result } = this.state;
 
+    let title;
+
     if ( 90 < quiz_result ) {
-      return 'Congratulations!';
+      title = 'Congratulations!';
     } else {
-      return 'Better luck next time!';
+      title = 'Better luck next time!';
     }
+
+    title = wp.hooks.applyFilters( 'reactQuiz_complete_message_title', title, quiz_result );
+
+    return title;
+
   }
 
+  /**
+   * Message when quiz completed
+   *
+   * @returns {*}
+   */
   loadCompleteMessage() {
     const { quiz_result } = this.state;
 
+    let message;
+
     if ( 90 < quiz_result ) {
-      return (
-        <p>
-          You Got { this.state.quiz_result }%!
-        </p>
-      )
+      message = 'You Got ' + this.state.quiz_result + '%!';
     } else {
-      return (
-        <p>
-          You only got { this.state.quiz_result }%
-        </p>
-      )
+      message = 'You only got ' + this.state.quiz_result + '%';
     }
+
+    message = wp.hooks.applyFilters( 'reactQuiz_complete_message', message, quiz_result );
+
+    return (
+      <p>
+        { message }
+      </p>
+    );
   }
 
   render() {
