@@ -57,6 +57,7 @@ class ReactQuizPlugin {
 				'core/paragraph',
 				'react-quiz-blocks/question-multiple-choice',
 				'react-quiz-blocks/question-text',
+				'react-quiz-blocks/question-youtube-pause-ask',
 			];
 
 		} else {
