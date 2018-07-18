@@ -24,6 +24,7 @@ __REQUIRES__
 
 ## Question Types
 * Multiple Choice text choices
+* Single Text - you set all the possible _correct_ answers
 
 # TODO
 
@@ -33,8 +34,8 @@ __REQUIRES__
 ### Question Types To Add
 * Video Embed w/ multiple choice
 * Multiple Choice - each choice an image
-* Text * with supporting "correct answers" array
 * Textarea
+* Flip `Single Text` Question so you put in all _incorrect_ answers
 
 ### Possible Quiz Types (taxonomy powered)
 * Youtube Embed with quiz, pause at points to ask question. End of video show results (or option to skip to results)
