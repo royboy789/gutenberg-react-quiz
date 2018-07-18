@@ -1,6 +1,8 @@
 import axios from 'axios';
 import YouTube from 'react-youtube';
 
+import './style.scss';
+
 const { Fragment, Component } = wp.element;
 const { TextControl, RadioControl } = wp.components;
 const { InspectorControls, MediaUpload } = wp.editor;
@@ -54,7 +56,7 @@ export default class QuestionYoutube extends Component {
   renderBlock() {
     if ( ! this.state.edit_mode ) {
       return (
-        <div>
+        <div id={'youtube-wrapper'}>
           <YouTube
             videoId={'3JgGJ7eG_JU'}
             onReady={this.readyPlayer}
@@ -75,7 +77,7 @@ export default class QuestionYoutube extends Component {
 
       const key = this.state.edit_question_key;
       return(
-        <div>
+        <div id={'question-edit-wrapper'}>
           <div>
             <TextControl
               label={ __( 'Question:' ) }
@@ -190,8 +192,8 @@ export default class QuestionYoutube extends Component {
                 attributes.questions.map( (question,key) =>{
                   return(
                     <div key={ key } className={'single-question'}>
-                      <div>
-                        <strong>Question:</strong> {question.question }
+                      <div className={'single-question--meta'}>
+                        <strong>Question:</strong> {question.question } <br/>
                         <strong>Seconds:</strong> { question.seconds } <br/>
                         <strong>Type:</strong> { question.question_type } <br/>
                       </div>
@@ -202,7 +204,7 @@ export default class QuestionYoutube extends Component {
                   )
                 })
               }
-              <span className={'button'} onClick={this.addQuestion}>+ Question</span>
+              <span className={'button addQuestionButton'} onClick={this.addQuestion}>+ Question</span>
             </InspectorControls>
           </Fragment>
         </div>

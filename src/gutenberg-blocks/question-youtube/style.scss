@@ -1,0 +1,25 @@
+.single-question {
+    padding: 10px 0;
+
+    & > div {
+        padding: 5px 0;
+    }
+
+    &--meta {
+    }
+}
+
+span.addQuestionButton {
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+#youtube-wrapper {
+    padding: 20px;
+}
+
+#question-edit-wrapper {
+    padding: 10px;
+}
