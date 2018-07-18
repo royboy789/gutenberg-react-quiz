@@ -60,9 +60,6 @@ __Quiz App__
 
 # TODO
 
-### Extendable "completed" screen
-* Filterable title & message args = % correct, array of results
-
 ### Question Types To Add
 * Video Embed w/ multiple choice
 * Multiple Choice - each choice an image
