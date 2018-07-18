@@ -54,7 +54,8 @@ class ReactQuizPlugin {
 
 			$allowed_blocks = [
 				'core/paragraph',
-				'react-quiz-blocks/question-multiple-choice'
+				'react-quiz-blocks/question-multiple-choice',
+				'react-quiz-blocks/question-text',
 			];
 
 		} else {

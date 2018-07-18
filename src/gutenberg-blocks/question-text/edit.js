@@ -1,40 +1,41 @@
 import EditOptions from './../components/editOptions';
 
 const { Fragment, Component } = wp.element;
-const { SelectControl, BaseControl, ToggleControl, TextControl, RadioControl } = wp.components;
+const { TextControl } = wp.components;
 const { InspectorControls, MediaUpload } = wp.editor;
 const { __ } = wp.i18n;
 
-export default class QuestionMultipleChoiceEdit extends Component {
+export default class QuestionText extends Component {
 
   constructor( props ) {
     super( props );
-    this.state = {
-      options: props.options
-    };
+    this.state = props;
 
-    this.addOption = this.addOption.bind(this);
+    this.addAnswer = this.addAnswer.bind(this);
     this.changeVal = this.changeVal.bind(this);
   }
 
-  addOption() {
+  addAnswer() {
     const { setAttributes, attributes } = this.props;
-    let { options } = attributes;
+    let { possible_answers } = attributes;
 
-    if ( ! options ) {
-      options = [];
+    console.log( possible_answers );
+
+    if ( ! possible_answers ) {
+      possible_answers = [];
     }
 
-    options.push({
-      label: '',
+    possible_answers.push({
       value: '',
     });
 
+    console.log( possible_answers );
+
     setAttributes({
-      options: options
+      possible_answers: possible_answers
     });
 
-    this.setState({ options: options });
+    this.setState({ possible_answers: possible_answers });
   }
 
   changeVal( event, attr ) {
@@ -42,6 +43,7 @@ export default class QuestionMultipleChoiceEdit extends Component {
 
     let data = {};
     data[attr] = event;
+
     setAttributes( data );
     this.setState( data );
   };
@@ -74,23 +76,16 @@ export default class QuestionMultipleChoiceEdit extends Component {
               </div>
               <div>
                 <EditOptions
-                  options={attributes.options}
-                  onChange={ (e) => this.changeVal( e, 'options') }
+                  options={ attributes.possible_answers }
+                  onChange={ (e) => this.changeVal( e, 'possible_answers' ) }
                 />
-                <span class="btn button" onClick={this.addOption}>+ Option</span>
-              </div>
-              <div>
-                <RadioControl
-                  label={ 'Correct Answer' }
-                  selected={ attributes.correct_answer }
-                  options={ attributes.options }
-                  onChange={ (e) => this.changeVal( e, 'correct_answer' ) }
-                />
+                <span className="btn button" onClick={this.addAnswer}>+ Possible Answer</span>
               </div>
             </InspectorControls>
           </Fragment>
         </div>
       </div>
-    );
+    )
   }
+
 }
