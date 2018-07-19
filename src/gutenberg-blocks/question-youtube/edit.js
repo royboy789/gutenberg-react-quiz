@@ -1,5 +1,7 @@
 import axios from 'axios';
 import YouTube from 'react-youtube';
+import YoutubeQuestionOptions from './options';
+import YouTubePausedQuestion from './paused-question';
 
 import './style.scss';
 
@@ -14,12 +16,15 @@ export default class QuestionYoutube extends Component {
 
   constructor( props ) {
     super( props );
+
     this.state = {
       player: null,
       questions: this.props.questions,
       edit_mode: false,
       edit_question: false,
       edit_question_key: false,
+      pause_times: [],
+      paused_question: false,
     };
 
 
@@ -27,6 +32,7 @@ export default class QuestionYoutube extends Component {
     this.playInit = this.playInit.bind(this);
     this.renderBlock = this.renderBlock.bind(this);
     this.initEditMode = this.initEditMode.bind(this);
+    this.playerTimeCheck = this.playerTimeCheck.bind(this);
 
     this.saveQuestions = this.saveQuestions.bind(this);
     this.addQuestion = this.addQuestion.bind(this);
@@ -36,9 +42,19 @@ export default class QuestionYoutube extends Component {
 
   // Ready Player callback
   readyPlayer( e ) {
+    const { attributes } = this.props;
+    const { questions } = attributes;
     const player = e.target;
+
+    // reset & set
+    let pause_times = [];
+    questions.map((question, key) => {
+      pause_times.push( parseInt( question.seconds ) );
+    });
+
     this.setState({
-      player: player
+      player: player,
+      pause_times: pause_times
     });
 
   }
@@ -47,66 +63,34 @@ export default class QuestionYoutube extends Component {
   playInit( e ) {
     const player = e.target;
 
-    this.setState({
-      player: player
-    });
+    this.playerInterval = setInterval((player) => {
+      this.playerTimeCheck( player );
+    }, 1000, player );
   }
 
-  // Render Block - state swap management
-  renderBlock() {
-    if ( ! this.state.edit_mode ) {
-      return (
-        <div id={'youtube-wrapper'}>
-          <YouTube
-            videoId={'3JgGJ7eG_JU'}
-            onReady={this.readyPlayer}
-            onPlay={this.playInit}
-          />
-        </div>
-      )
-    } else {
-      let question = this.state.edit_question;
-      const { player } = this.state;
-      if ( player ) {
-        player.stopVideo();
-        player.destroy();
-        this.setState({
-          player: null
-        });
-      }
+  // Player Interval Time Check & Init Pause n' Ask
+  playerTimeCheck( player ) {
+    let currentTime = parseInt( player.getCurrentTime() );
+    const { pause_times } = this.state;
+    let pause = ( -1 !== pause_times.indexOf( currentTime ) );
 
-      const key = this.state.edit_question_key;
-      return(
-        <div id={'question-edit-wrapper'}>
-          <div>
-            <TextControl
-              label={ __( 'Question:' ) }
-              value={ question.question ? question.question : '' }
-              onChange={ (e) => this.saveQuestion( e, key, 'question' ) }
-            />
-          </div>
-          <div>
-            <TextControl
-              label={ __( 'Seconds' ) }
-              value={ question.seconds ? question.seconds : '' }
-              onChange={ (e) => this.saveQuestion( e, key, 'seconds' ) }
-            />
-          </div>
-          <div>
-            <RadioControl
-              label={ __( 'Question Type' ) }
-              selected={ question.question_type }
-              options={[
-                { label: 'Text', value: 'text' },
-                { label: 'Multiple Text Choices', value: 'multiple_text' }
-              ]}
-              onChange={ (e) => this.saveQuestion( e, key, 'question_type' )}
-            />
-          </div>
-          <span className={'button'} onClick={ (e) => { this.setState({ edit_mode: false, edit_question: false } ) } }>close</span>
-        </div>
-      )
+    if ( pause ) {
+      this.initPauseNAsk( pause_times.indexOf( currentTime ) );
+      player.pauseVideo();
     }
+
+  }
+
+  initPauseNAsk( question_key ) {
+    const { attributes } = this.props;
+    const { questions } = attributes;
+
+    const question = questions[ question_key ];
+
+    this.setState({
+      paused_question: question
+    });
+
   }
 
   // Start Question Edit Mode
@@ -146,7 +130,8 @@ export default class QuestionYoutube extends Component {
       seconds: false,
       question: 'TESTING',
       question_type: 'text',
-      options: []
+      options: [],
+      correct_answer: ''
     });
 
     this.saveQuestions( questions );
@@ -175,19 +160,122 @@ export default class QuestionYoutube extends Component {
     let { questions } = attributes;
 
     questions[key][field] = e;
-
     this.saveQuestions( questions );
+  }
 
+
+  // Render Block - state swap management
+  renderBlock() {
+    const { attributes } = this.props;
+    let active_question;
+
+    if ( ! attributes.youtube_id ) {
+      // No Youtube ID set
+      return(
+        <div>
+          <p>
+            No Youtube Video ID set - add the ID on the right.
+          </p>
+        </div>
+      )
+    }
+
+    if ( false !== this.state.paused_question ) {
+      active_question = <YouTubePausedQuestion
+        question={ this.state.paused_question }
+      />;
+    }
+
+
+    if ( ! this.state.edit_mode ) {
+      // Youtube Player
+      return (
+        <div id={'youtube-wrapper'}>
+          { active_question }
+          <YouTube
+            videoId={ attributes.youtube_id }
+            onReady={this.readyPlayer}
+            onPlay={this.playInit}
+            onPause={ (e) => { clearInterval( this.playerInterval )}}
+          />
+        </div>
+      )
+    } else {
+      // Edit Question
+      let question = this.state.edit_question;
+      const key = this.state.edit_question_key;
+
+      // Destroy Player and set player to null
+      const { player } = this.state;
+      if ( player ) {
+        player.stopVideo();
+        player.destroy();
+        this.setState({
+          player: null
+        });
+      }
+
+      // Return Edit Question
+      return(
+        <div id={'question-edit-wrapper'}>
+          <div>
+            <TextControl
+              label={ __( 'Question:' ) }
+              value={ question.question ? question.question : '' }
+              onChange={ (e) => this.saveQuestion( e, key, 'question' ) }
+            />
+          </div>
+          <div>
+            <TextControl
+              label={ __( 'Seconds' ) }
+              value={ question.seconds ? question.seconds : '' }
+              onChange={ (e) => this.saveQuestion( e, key, 'seconds' ) }
+            />
+          </div>
+          <div>
+            <RadioControl
+              label={ __( 'Question Type' ) }
+              selected={ question.question_type }
+              options={[
+                { label: 'Text', value: 'text' },
+                { label: 'Multiple Text Choices', value: 'multiple_text' }
+              ]}
+              onChange={ (e) => this.saveQuestion( e, key, 'question_type' )}
+            />
+          </div>
+          <div>
+            <YoutubeQuestionOptions
+              options={ question.options }
+              questionType={ question.question_type }
+              correctAnswer={ question.correct_answer }
+              onOptionsChange={ (e) => this.saveQuestion( e, key, 'options' ) }
+              onCorrectAnswerChange={ (e) => this.saveQuestion( e, key, 'correct_answer' ) }
+            />
+          </div>
+          <hr/>
+          <span className={'button'} onClick={ (e) => { this.setState({ edit_mode: false, edit_question: false, edit_question_key: false, paused_question: false } ) } }>close</span>
+        </div>
+      )
+    }
   }
 
   render() {
     const { attributes } = this.props;
     return(
       <div>
+        <h2>Youtube Pause & Ask</h2>
         { this.renderBlock() }
         <div id={'inspector'}>
           <Fragment>
             <InspectorControls>
+              <TextControl
+                label={ __( 'Youtube Video ID' ) }
+                value={ attributes.youtube_id }
+                onChange={ (e) => { this.props.setAttributes({ youtube_id: e })}}
+              />
+              <div>
+                <h4>Pause & Ask Questions:</h4>
+              </div>
               {
                 attributes.questions.map( (question,key) =>{
                   return(

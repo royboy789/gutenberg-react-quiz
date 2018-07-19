@@ -19,8 +19,6 @@ export default class QuestionText extends Component {
     const { setAttributes, attributes } = this.props;
     let { possible_answers } = attributes;
 
-    console.log( possible_answers );
-
     if ( ! possible_answers ) {
       possible_answers = [];
     }
@@ -28,8 +26,6 @@ export default class QuestionText extends Component {
     possible_answers.push({
       value: '',
     });
-
-    console.log( possible_answers );
 
     setAttributes({
       possible_answers: possible_answers

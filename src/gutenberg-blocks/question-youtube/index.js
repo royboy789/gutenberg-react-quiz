@@ -14,7 +14,8 @@ export const settings = {
     },
     youtube_id : {
       type: 'string',
-      required: true
+      required: true,
+      default: null
     },
     questions: {},
   },
