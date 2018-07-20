@@ -405,6 +405,11 @@ export default class QuestionYoutube extends Component {
 
   render() {
     const { attributes, setAttributes } = this.props;
+
+    if ( ! attributes.questions || ! attributes.questions instanceof Array ) {
+      attributes.questions = [];
+    }
+
     return(
       <div>
         <h2>Youtube Pause & Ask</h2>
