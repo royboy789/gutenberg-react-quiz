@@ -1,7 +1,7 @@
 import axios from 'axios';
 import YouTube from 'react-youtube';
 import YoutubeQuestionOptions from './options';
-import YouTubePausedQuestion from './paused-question';
+import YouTubePausedQuestion from '../../shared-components/question-youtube/paused-question';
 
 import './style.scss';
 
@@ -19,14 +19,19 @@ export default class QuestionYoutube extends Component {
 
     this.state = {
       player: null,
-      questions: this.props.questions,
+      questions: this.props.attributes.questions,
+      youtube_id: this.props.attributes.youtube_id,
+      autoplay: this.props.attributes.autoplay,
       edit_mode: false,
       edit_question: false,
       edit_question_key: false,
       pause_times: [],
       paused_question: false,
+      correct_answers: [],
+      quiz_complete: false
     };
 
+    this.saveBlockData = this.saveBlockData.bind(this);
 
     this.readyPlayer = this.readyPlayer.bind(this);
     this.playInit = this.playInit.bind(this);
@@ -37,10 +42,15 @@ export default class QuestionYoutube extends Component {
     this.saveQuestions = this.saveQuestions.bind(this);
     this.addQuestion = this.addQuestion.bind(this);
     this.deleteQuestion = this.deleteQuestion.bind(this);
+    this.answerQuestion = this.answerQuestion.bind(this);
 
   }
 
-  // Ready Player callback
+  /**
+   * Video Player Ready Callback
+   * 
+   * @param e
+   */
   readyPlayer( e ) {
     const { attributes } = this.props;
     const { questions } = attributes;
@@ -59,7 +69,11 @@ export default class QuestionYoutube extends Component {
 
   }
 
-  // On Play Callback
+  /**
+   * Video Play Callback
+   * 
+   * @param e
+   */
   playInit( e ) {
     const player = e.target;
 
@@ -68,32 +82,68 @@ export default class QuestionYoutube extends Component {
     }, 1000, player );
   }
 
-  // Player Interval Time Check & Init Pause n' Ask
+  /**
+   * Interval Player Time Check
+   *
+   * Interval = this.playerInterval
+   *
+   * @param player
+   */
   playerTimeCheck( player ) {
     let currentTime = parseInt( player.getCurrentTime() );
     const { pause_times } = this.state;
-    let pause = ( -1 !== pause_times.indexOf( currentTime ) );
 
-    if ( pause ) {
+    let isPauseTime = pause_times.indexOf( currentTime );
+    let pause = ( -1 !== isPauseTime );
+
+    if ( pause && 'undefined' === typeof this.state.correct_answers[ isPauseTime ] ) {
       this.initPauseNAsk( pause_times.indexOf( currentTime ) );
-      player.pauseVideo();
+    } else if ( pause && this.state.correct_answers[ isPauseTime ] ) {
+      console.log( 'Question ' + isPauseTime + ' answered' );
     }
 
   }
 
+  /**
+   * Pause and Ask Question Init
+   * 
+   * @param question_key
+   */
   initPauseNAsk( question_key ) {
     const { attributes } = this.props;
     const { questions } = attributes;
-
     const question = questions[ question_key ];
 
+    if ( this.state.edit_mode ) {
+      this.setState({
+        edit_mode: false,
+        edit_question: false,
+        edit_question_key: false
+      });
+    }
+
+    if ( 'multiple_text' === question.question_type && ! question.options.length ) {
+      console.log( 'QUESTION ERROR: no options' );
+      return;
+    }
+
     this.setState({
-      paused_question: question
+      paused_question: question,
+      paused_question_key: question_key,
+    }, () => {
+      if ( this.state.player ) {
+        this.state.player.seekTo( question.seconds, true );
+        this.state.player.pauseVideo();
+      }
     });
 
   }
 
-  // Start Question Edit Mode
+  /**
+   * Edit Mode Init
+   * 
+   * @param key
+   */
   initEditMode( key ) {
     const { attributes } = this.props;
     const { questions } = attributes;
@@ -105,7 +155,11 @@ export default class QuestionYoutube extends Component {
     });
   }
 
-  // Dealing with Question
+  /**
+   * Save all questions
+   * 
+   * @param questions
+   */
   saveQuestions( questions ) {
     const { setAttributes } = this.props;
 
@@ -118,6 +172,11 @@ export default class QuestionYoutube extends Component {
     });
   }
 
+  /**
+   * Add New Question
+   * 
+   * @param e
+   */
   addQuestion( e ) {
     const { attributes, setAttributes } = this.props;
     let { questions } = attributes;
@@ -128,7 +187,7 @@ export default class QuestionYoutube extends Component {
 
     questions.push({
       seconds: false,
-      question: 'TESTING',
+      question: '',
       question_type: 'text',
       options: [],
       correct_answer: ''
@@ -140,6 +199,12 @@ export default class QuestionYoutube extends Component {
 
   }
 
+  /**
+   * Delete Question
+   * 
+   * @param key
+   * @returns {boolean}
+   */
   deleteQuestion( key ) {
     const { attributes } = this.props;
     let { questions } = attributes;
@@ -155,7 +220,14 @@ export default class QuestionYoutube extends Component {
 
   }
 
-  saveQuestion( e, key, field ) {
+  /**
+   * Update Question Field
+   * 
+   * @param e - value
+   * @param key - index of question to edit
+   * @param field - which field to update
+   */
+  updateQuestionField( e, key, field ) {
     const { attributes } = this.props;
     let { questions } = attributes;
 
@@ -163,14 +235,79 @@ export default class QuestionYoutube extends Component {
     this.saveQuestions( questions );
   }
 
+  /**
+   * Callback from YouTubePausedQuestion
+   *
+   * @param correct
+   */
+  answerQuestion( correct ) {
+    let { correct_answers, paused_question_key, paused_question } = this.state;
+    const { attributes, setAttributes } = this.props;
+    let { questions } = attributes;
 
-  // Render Block - state swap management
+    // Push correct boolean
+    correct_answers[ paused_question_key ] = correct;
+
+    this.setState({
+      correct_answers: correct_answers,
+      paused_question: false,
+      paused_question_key: false
+    }, () => {
+      if ( this.state.correct_answers.length === questions.length ) {
+        // Completed Quiz
+        this.setState({
+          quiz_complete: true
+        });
+      }
+
+      // play video
+      this.state.player.playVideo();
+    });
+
+  }
+
+  /**
+   * Count how many times "what" appaers in array
+   *
+   * @param array
+   * @param what
+   * @returns {number}
+   */
+  countInArray( array, what ) {
+    let count = 0;
+    for (let i = 0; i < array.length; i++) {
+      if (array[i] === what) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Save Block Level Data
+   *
+   * @param e
+   * @param key
+   */
+  saveBlockData( e, key ) {
+    let data = {};
+    data[key] = e;
+    this.props.setAttributes( data );
+    this.setState( data );
+  }
+
+
+  /**
+   * Render Main Gutes Block
+   *
+   * @returns {*}
+   */
   renderBlock() {
     const { attributes } = this.props;
     let active_question;
 
+    // No Youtube ID set
     if ( ! attributes.youtube_id ) {
-      // No Youtube ID set
       return(
         <div>
           <p>
@@ -180,12 +317,19 @@ export default class QuestionYoutube extends Component {
       )
     }
 
+    // Paused Question
     if ( false !== this.state.paused_question ) {
       active_question = <YouTubePausedQuestion
         question={ this.state.paused_question }
+        onAnswer={ this.answerQuestion }
       />;
     }
 
+    // Quiz Completed
+    if ( this.state.quiz_complete ) {
+      let result = ( this.countInArray( this.state.correct_answers, true ) / attributes.questions.length ) * 100;
+      active_question = 'Quiz Complete You Got ' + result + '%';
+    }
 
     if ( ! this.state.edit_mode ) {
       // Youtube Player
@@ -193,7 +337,7 @@ export default class QuestionYoutube extends Component {
         <div id={'youtube-wrapper'}>
           { active_question }
           <YouTube
-            videoId={ attributes.youtube_id }
+            videoId={ this.state.youtube_id }
             onReady={this.readyPlayer}
             onPlay={this.playInit}
             onPause={ (e) => { clearInterval( this.playerInterval )}}
@@ -222,14 +366,14 @@ export default class QuestionYoutube extends Component {
             <TextControl
               label={ __( 'Question:' ) }
               value={ question.question ? question.question : '' }
-              onChange={ (e) => this.saveQuestion( e, key, 'question' ) }
+              onChange={ (e) => this.updateQuestionField( e, key, 'question' ) }
             />
           </div>
           <div>
             <TextControl
               label={ __( 'Seconds' ) }
               value={ question.seconds ? question.seconds : '' }
-              onChange={ (e) => this.saveQuestion( e, key, 'seconds' ) }
+              onChange={ (e) => this.updateQuestionField( e, key, 'seconds' ) }
             />
           </div>
           <div>
@@ -240,7 +384,7 @@ export default class QuestionYoutube extends Component {
                 { label: 'Text', value: 'text' },
                 { label: 'Multiple Text Choices', value: 'multiple_text' }
               ]}
-              onChange={ (e) => this.saveQuestion( e, key, 'question_type' )}
+              onChange={ (e) => this.updateQuestionField( e, key, 'question_type' )}
             />
           </div>
           <div>
@@ -248,8 +392,8 @@ export default class QuestionYoutube extends Component {
               options={ question.options }
               questionType={ question.question_type }
               correctAnswer={ question.correct_answer }
-              onOptionsChange={ (e) => this.saveQuestion( e, key, 'options' ) }
-              onCorrectAnswerChange={ (e) => this.saveQuestion( e, key, 'correct_answer' ) }
+              onOptionsChange={ (e) => this.updateQuestionField( e, key, 'options' ) }
+              onCorrectAnswerChange={ (e) => this.updateQuestionField( e, key, 'correct_answer' ) }
             />
           </div>
           <hr/>
@@ -260,18 +404,34 @@ export default class QuestionYoutube extends Component {
   }
 
   render() {
-    const { attributes } = this.props;
+    const { attributes, setAttributes } = this.props;
     return(
       <div>
         <h2>Youtube Pause & Ask</h2>
+
         { this.renderBlock() }
         <div id={'inspector'}>
           <Fragment>
             <InspectorControls>
+              <RadioControl
+                label={ __( 'Autoplay?' ) }
+                options={[
+                  {
+                    value: 'false',
+                    label: __( 'No' )
+                  },
+                  {
+                    value: 'true',
+                    label: __( 'Yes' )
+                  }
+                ]}
+                selected={ this.state.autoplay }
+                onChange={ (e) => { this.saveBlockData( e, 'autoplay' ) } }
+              />
               <TextControl
                 label={ __( 'Youtube Video ID' ) }
-                value={ attributes.youtube_id }
-                onChange={ (e) => { this.props.setAttributes({ youtube_id: e })}}
+                value={ this.state.youtube_id }
+                onChange={ (e) => { this.saveBlockdata( e, 'youtube_id' ) } }
               />
               <div>
                 <h4>Pause & Ask Questions:</h4>
@@ -285,7 +445,7 @@ export default class QuestionYoutube extends Component {
                         <strong>Seconds:</strong> { question.seconds } <br/>
                         <strong>Type:</strong> { question.question_type } <br/>
                       </div>
-
+                      <span className={'button'} onClick={ (e) => this.initPauseNAsk( key ) }>view</span>
                       <span className={'button'} onClick={ (e) => this.initEditMode( key ) }>edit</span>
                       <span className={'button'} onClick={ (e) => this.deleteQuestion( key ) }>remove</span>
                     </div>

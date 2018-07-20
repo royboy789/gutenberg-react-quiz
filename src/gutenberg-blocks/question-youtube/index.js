@@ -12,6 +12,10 @@ export const settings = {
     hint: {
       type: 'string'
     },
+    autoplay: {
+      type: 'string',
+      default: 'false'
+    },
     youtube_id : {
       type: 'string',
       required: true,

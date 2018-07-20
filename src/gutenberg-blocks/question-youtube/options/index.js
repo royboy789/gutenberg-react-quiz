@@ -1,9 +1,11 @@
+var wp = window.wp;
+
 const { Fragment, Component } = wp.element;
 const { TextControl, RadioControl } = wp.components;
 const { InspectorControls, MediaUpload } = wp.editor;
 const { __ } = wp.i18n;
 
-import './../style.scss';
+import '../style.scss';
 
 export default class YoutubeQuestionOptions extends Component {
 

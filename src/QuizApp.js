@@ -5,6 +5,7 @@ import axios from 'axios';
 // Questions
 import QuestionMultipleChoice from './question-components/multiple-choice';
 import QuestionText from './question-components/text';
+import QuestionYoutubePauseAsk from './question-components/youtube-pause-ask';
 
 
 const api = axios.create({
@@ -59,6 +60,9 @@ class QuizApp extends Component {
         break;
       case 'question-text':
         returnComp = QuestionText;
+        break;
+      case 'question-youtube-pause-ask':
+        returnComp = QuestionYoutubePauseAsk;
         break;
       default:
         console.log( 'cannot find question type: ' + question );
@@ -120,11 +124,10 @@ class QuizApp extends Component {
    * Complete Quiz
    */
   completeQuiz() {
-    const { answered_questions, total_questions } = this.state;
 
     let final_state = {
       quiz_complete: true,
-      quiz_result: ( this.countInArray( answered_questions, true ) / total_questions ) * 100
+      quiz_result: this.calculateResult()
     };
 
     wp.hooks.applyFilters( 'reactQuiz_quiz_final_state', final_state );
@@ -132,6 +135,24 @@ class QuizApp extends Component {
     this.setState( final_state, () => {
       wp.hooks.doAction( 'reactQuiz_complete_react_quiz', this.state );
     });
+  }
+
+  calculateResult() {
+    const { answered_questions, total_questions } = this.state;
+    let all_answered_array = [];
+
+    answered_questions.map((result, key) => {
+      if ( result instanceof Array ) {
+        return result.map((inner_result, key) => {
+          return all_answered_array.push( inner_result );
+        });
+      } else {
+        return all_answered_array.push( result );
+      }
+    });
+
+    let perc = ( this.countInArray( all_answered_array, true ) / total_questions ) * 100;
+    return Math.round(perc * 100) / 100
   }
 
   /**
