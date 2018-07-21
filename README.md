@@ -25,6 +25,8 @@ __REQUIRES__
 ## Question Types
 * Multiple Choice text choices
 * Single Text - you set all the possible _correct_ answers
+* "YouTube Pause n' Ask" - embed a video, and pause at second and ask text or multiple choice
+  * 
 
 ## JavaScript Hooks
 There are a number of `wp.hooks` I've implemented, and will be adding more as I go
@@ -69,9 +71,6 @@ __Quiz App__
 * Multiple Choice - each choice an image
 * Textarea
 * Flip `Single Text` Question so you put in all _incorrect_ answers
-
-### Possible Quiz Types (taxonomy powered)
-* Youtube Embed with quiz, pause at points to ask question. End of video show results (or option to skip to results)
 
 ### Extendability
 * Add in hook to add more question types (filterable array?)

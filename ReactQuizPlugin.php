@@ -29,11 +29,30 @@ class ReactQuizPlugin {
 	}
 
 	public function react_quiz_enqueue() {
+
+		$file = file_get_contents( plugin_dir_path( __FILE__ ) . '/build/asset-manifest.json' );
+		$file = json_decode( $file );
 		$dir = __DIR__;
-		$blocks_js = '/build/static/js/bundle.js';
+		$blocks_js = '/build/' . $file->{ 'main.js' };
+		$block_css = '/build/' . $file->{ 'main.css' };
+
+		if ( ! defined( 'WP_ENV' ) || ( defined( 'WP_ENV' ) && 'dev' !== WP_ENV ) ) {
+			$jsFile = plugins_url( $blocks_js, __FILE__ );
+		} else {
+			// if running dev, don't forget to 'npm run start'.
+			$jsFile = '//localhost:3000/static/js/bundle.js';
+		}
+
+		if ( ! defined( 'WP_ENV' ) || ( defined( 'WP_ENV' ) && 'dev' !== WP_ENV ) ) {
+			$cssFile = plugins_url( $block_css, __FILE__ );
+			wp_enqueue_style( 'react-quiz-main-style', $cssFile, array(), null, 'all' );
+		} else {
+			$cssFile = false;
+		}
+
 		wp_enqueue_script( 'wp-components' );
 		wp_enqueue_script( 'wp-hooks' );
-		wp_enqueue_script( 'react-quiz-main', '//localhost:3000/static/js/bundle.js', array( 'wp-hooks' ), null, true );
+		wp_enqueue_script( 'react-quiz-main', $jsFile, array( 'wp-hooks' ), null, true );
 	}
 
 	public function react_quiz_enqueue_block_editor_assets() {
@@ -57,6 +76,7 @@ class ReactQuizPlugin {
 				'core/paragraph',
 				'react-quiz-blocks/question-multiple-choice',
 				'react-quiz-blocks/question-text',
+				'react-quiz-blocks/question-youtube-pause-ask',
 			];
 
 		} else {

@@ -1,0 +1,18 @@
+#youtube-wrapper {
+  position: relative;
+
+  #active-question-wrapper,
+  #youtube-pause-ask-complete {
+    background: rgba( 255,255,255,0.95 );
+    height: 100%;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 0;
+    width: 100%;
+  }
+
+  #youtube-pause-ask-complete {
+    padding: 50px;
+  }
+}
