@@ -64,9 +64,6 @@ export default class YouTubePausedQuestion extends Component {
 
     let correct = answer.toString() === question.correct_answer.toString();
 
-    console.log( answer.toString(), question.correct_answer.toString() );
-    console.log( correct, question.correct_answer, question );
-
     this.props.onAnswer( correct );
   }
 

@@ -436,7 +436,7 @@ export default class QuestionYoutube extends Component {
               <TextControl
                 label={ __( 'Youtube Video ID' ) }
                 value={ this.state.youtube_id }
-                onChange={ (e) => { this.saveBlockdata( e, 'youtube_id' ) } }
+                onChange={ (e) => { this.saveBlockData( e, 'youtube_id' ) } }
               />
               <div>
                 <h4>Pause & Ask Questions:</h4>

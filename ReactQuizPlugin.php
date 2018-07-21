@@ -53,6 +53,11 @@ class ReactQuizPlugin {
 		wp_enqueue_script( 'wp-components' );
 		wp_enqueue_script( 'wp-hooks' );
 		wp_enqueue_script( 'react-quiz-main', $jsFile, array( 'wp-hooks' ), null, true );
+
+		wp_localize_script( 'react-quiz-main', 'ReactQuizObject', [
+			'rest_url' => esc_url( get_rest_url() ),
+			'nonce' => wp_create_nonce( 'wp_rest' ),
+		]);
 	}
 
 	public function react_quiz_enqueue_block_editor_assets() {
