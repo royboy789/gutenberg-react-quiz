@@ -10,6 +10,7 @@ There is currently 2 React Apps.
 
 ## Installation
 * Clone
+* Run `composer install`
 * Run `npm run build`
 * Run `npm run gutes-build` 
 
