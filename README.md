@@ -27,7 +27,7 @@ __REQUIRES__
 * Multiple Choice text choices
 * Single Text - you set all the possible _correct_ answers
 * "YouTube Pause n' Ask" - embed a video, and pause at second and ask text or multiple choice
-  * 
+  * [Demo](https://arcctrl.com/2018/07/20/test-quiz/)
 
 ## JavaScript Hooks
 There are a number of `wp.hooks` I've implemented, and will be adding more as I go
