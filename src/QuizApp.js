@@ -7,9 +7,9 @@ import QuestionMultipleChoice from './question-components/multiple-choice';
 import QuestionText from './question-components/text';
 import QuestionYoutubePauseAsk from './question-components/youtube-pause-ask';
 
-
+const ReactQuizObject = window.ReactQuizObject;
 const api = axios.create({
-  baseURL: 'http://wordpress.test/wp-json/'
+  baseURL: ReactQuizObject.rest_url
 });
 
 const wp = window.wp;
@@ -150,6 +150,8 @@ class QuizApp extends Component {
         return all_answered_array.push( result );
       }
     });
+
+    console.log( 'all answers: ', all_answered_array );
 
     let perc = ( this.countInArray( all_answered_array, true ) / total_questions ) * 100;
     return Math.round(perc * 100) / 100
